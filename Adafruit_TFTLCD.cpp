@@ -29,6 +29,7 @@
 #define ID_7575    1
 #define ID_9341    2
 #define ID_HX8357D    3
+#define ID_HX8347A    4
 #define ID_UNKNOWN 0xFF
 
 #include "registers.h"
@@ -170,6 +171,112 @@ static const uint8_t HX8347G_regValues[] PROGMEM = {
   0x07           , 0x00,
   0x08           , 0x01,
   0x09           , 0x3F
+}
+
+static const uint8_t HX8347A_regValues[] PROGMEM = {
+// Thre seem to be several GAMMA configs floatings around thw WEB ...
+#if 0
+  0x46,0xA4,
+  0x47,0x53,
+  0x48,0x00,
+  0x49,0x44,
+  0x4a,0x04,
+  0x4b,0x67,
+  0x4c,0x33,
+  0x4d,0x77,
+  0x4e,0x12,
+  0x4f,0x4C,
+  0x50,0x46,
+  0x51,0x44,
+#endif
+
+#if 1
+  0x46, 0x95,
+  0x47, 0x51,
+  0x48, 0x00,
+  0x49, 0x36,
+  0x4A, 0x11,
+  0x4B, 0x66,
+  0x4C, 0x14,
+  0x4D, 0x77,
+  0x4E, 0x13,
+  0x4F, 0x4C,
+  0x50, 0x46,
+  0x51, 0x46,
+#endif
+
+  //240x320 window setting
+  0x02,0x00, // Column address start2
+  0x03,0x00, // Column address start1
+  0x04,0x00, // Column address end2
+  0x05,0xef, // Column address end1
+  0x06,0x00, // Row address start2
+  0x07,0x00, // Row address start1
+  0x08,0x01, // Row address end2
+  0x09,0x3f, // Row address end1
+
+  // Display Setting
+  //0x01,0x06, // IDMON=0, INVON=1, NORON=1, PTLON=0
+  0x01,0x02, // IDMON=0, INVON=0, NORON=1, PTLON=0 bootup default
+  0x16,0xC8, // MY=0, MX=0, MV=0, ML=1, BGR=1, TEON=0   0048
+  //0x70,0X05, // GS=0, SS=0, TEMO=0, TEON=0, CSEL=101=16bit colour
+  //0x70,0X06, // GS=0, SS=0, TEMO=0, TEON=0, CSEL=110=18bit colour
+  0x23,0x95, // N_DC=1001 0101
+  0x24,0x95, // PI_DC=1001 0101
+  0x25,0xFF, // I_DC=1111 1111
+
+  0x27,0x02, // N_BP=0000 0010
+  0x28,0x02, // N_FP=0000 0010
+  0x29,0x02, // PI_BP=0000 0010
+  0x2a,0x02, // PI_FP=0000 0010
+  0x2C,0x02, // I_BP=0000 0010
+  0x2d,0x02, // I_FP=0000 0010
+  0x3a,0x01, // N_RTN=0000, N_NW=001    0001
+  0x3b,0x01, // P_RTN=0000, P_NW=001
+  0x3c,0xf0, // I_RTN=1111, I_NW=000
+  0x3d,0x00, // DIV=00
+  TFTLCD_DELAY   , 5   , // delay 5 ms
+  0x35,0x38, // EQS=38h
+  0x36,0x78, // EQP=78h
+  0x3E,0x38, // SON=38h
+  0x40,0x0F, // GDON=0Fh
+  0x41,0xF0, // GDOFF
+
+  // Power Supply Setting
+  0x19,0x49, // CADJ=0100, CUADJ=100, OSD_EN=1 ,60Hz
+  0x93,0x0F, // RADJ=1111, 100%
+  TFTLCD_DELAY   , 5   , // delay 5 ms
+  0x20,0x40, // BT=0100
+  0x1D,0x07, // VC1=111   0007
+  0x1E,0x00, // VC3=000
+  0x1F,0x04, // VRH=0011
+
+  //VCOM SETTING
+  0x44,0x4D, // VCM=101 0000  4D
+  0x45,0x0E, // VDV=1 0001   0011
+  TFTLCD_DELAY   , 5   , // delay 5 ms
+  0x1C,0x04, // AP=100
+  TFTLCD_DELAY   , 5   , // delay 5 ms
+  0x1B,0x18, // GASENB=0, PON=0, DK=1, XDK=0, VLCD_TRI=0, STB=0
+  TFTLCD_DELAY   , 5   , // delay 5 ms
+  0x1B,0x10, // GASENB=0, PON=1, DK=0, XDK=0, VLCD_TRI=0, STB=0
+  TFTLCD_DELAY   , 5   , // delay 5 ms
+  0x43,0x80, //set VCOMG=1
+  TFTLCD_DELAY   , 5   , // delay 5 ms
+
+  // Display ON Setting
+  //0x90,0x7F, // SAP=0111 1111
+  0x26,0x04, //GON=0, DTE=0, D=01
+  TFTLCD_DELAY   , 100   ,
+  0x26,0x24, //GON=1, DTE=0, D=01
+  0x26,0x2C, //GON=1, DTE=0, D=11
+  TFTLCD_DELAY   , 100   ,
+  0x26,0x3C, //GON=1, DTE=1, D=11
+
+  // INTERNAL REGISTER SETTING
+  0x57,0x02, // TEST_Mode=1: into TEST mode
+  0x95,0x01, // SET DISPLAY CLOCK AND PUMPING CLOCK TO SYNCHRONIZE
+  0x57,0x00, // TEST_Mode=0: exit TEST mode
 };
 
 static const uint8_t HX8357D_regValues[] PROGMEM = {
@@ -336,6 +443,27 @@ void Adafruit_TFTLCD::begin(uint16_t id) {
     }
     setRotation(rotation);
     setLR(); // Lower-right corner of address window
+    
+  } else if(id == 0x4747) {
+
+    uint8_t a, d;
+    driver = ID_HX8347A;
+    CS_ACTIVE;
+    while(i < sizeof(HX8347A_regValues)) {
+      a = pgm_read_byte(&HX8347A_regValues[i++]);
+      d = pgm_read_byte(&HX8347A_regValues[i++]);
+      if(a == TFTLCD_DELAY) delay(d);
+      else                  writeRegister8(a, d);
+    }
+
+    // Some drivers have this dummy write
+    CS_ACTIVE;
+    CD_COMMAND;
+    write8(0x22);
+    CS_IDLE;
+
+    setRotation(rotation);
+    setLR(); // Lower-right corner of address window
 
   } else {
     driver = ID_UNKNOWN;
@@ -426,7 +554,7 @@ void Adafruit_TFTLCD::setAddrWindow(int x1, int y1, int x2, int y2) {
     writeRegister16(0x0020, x ); // Set address counter to top left
     writeRegister16(0x0021, y );
 
-  } else if(driver == ID_7575) {
+  } else if((driver == ID_7575) || (driver == ID_HX8347A)) {
 
     writeRegisterPair(HX8347G_COLADDRSTART_HI, HX8347G_COLADDRSTART_LO, x1);
     writeRegisterPair(HX8347G_ROWADDRSTART_HI, HX8347G_ROWADDRSTART_LO, y1);
@@ -465,6 +593,64 @@ void Adafruit_TFTLCD::setLR(void) {
 // Fast block fill operation for fillScreen, fillRect, H/V line, etc.
 // Requires setAddrWindow() has previously been called to set the fill
 // bounds.  'len' is inclusive, MUST be >= 1.
+#if 0
+// Technically this is what the HX8347A datasheet says we should d for
+// an 8 bit interface but it dowsn't work :-()
+void Adafruit_TFTLCD::flood(uint16_t color, uint32_t len) {
+  uint16_t blocks;
+  uint8_t  i, hi, lo, mid;
+
+  CS_ACTIVE;
+  CD_COMMAND;
+  write8(0x22); // Write data to GRAM
+
+  // Write first pixel normally, decrement counter by 1
+  CD_DATA;
+  hi =  ((color & 0xF800) >> 8);
+  mid = ((color & 0x07E0) >> 3);
+  lo =  ((color & 0x001F) << 2);
+  write8(hi);
+  write8(mid);
+  write8(lo);
+
+  len--;
+
+  blocks = (uint16_t)(len / 64); // 64 pixels/block
+  if ((hi == lo) && (hi == mid)) {
+    // High and low bytes are identical.  Leave prior data
+    // on the port(s) and just toggle the write strobe.
+    while(blocks--) {
+      i = 16; // 64 pixels/block / 4 pixels/pass
+      do {
+        WR_STROBE; WR_STROBE; WR_STROBE; // 3 bytes/pixel
+        WR_STROBE; WR_STROBE; WR_STROBE; // x 4 pixels
+        WR_STROBE; WR_STROBE; WR_STROBE;
+        WR_STROBE; WR_STROBE; WR_STROBE;
+      } while(--i);
+    }
+    // Fill any remaining pixels (1 to 64)
+    for(i = (uint8_t)len & 63; i--; ) {
+      WR_STROBE; WR_STROBE; WR_STROBE;
+    }
+  } else {
+    while(blocks--) {
+      i = 16; // 64 pixels/block / 4 pixels/pass
+      do {
+        write8(hi); write8(mid); write8(lo);
+        write8(hi); write8(mid); write8(lo);
+        write8(hi); write8(mid); write8(lo);
+        write8(hi); write8(mid); write8(lo);
+      } while(--i);
+    }
+    for(i = (uint8_t)len & 63; i--; ) {
+      write8(hi);
+      write8(mid);
+      write8(lo);
+    }
+  }
+  CS_IDLE;
+}
+#else
 void Adafruit_TFTLCD::flood(uint16_t color, uint32_t len) {
   uint16_t blocks;
   uint8_t  i, hi = color >> 8,
@@ -520,6 +706,7 @@ void Adafruit_TFTLCD::flood(uint16_t color, uint32_t len) {
   }
   CS_IDLE;
 }
+#endif
 
 void Adafruit_TFTLCD::drawFastHLine(int16_t x, int16_t y, int16_t length,
   uint16_t color)
@@ -621,7 +808,7 @@ void Adafruit_TFTLCD::fillScreen(uint16_t color) {
     writeRegister16(0x0020, x);
     writeRegister16(0x0021, y);
 
-  } else if ((driver == ID_9341) || (driver == ID_7575) || (driver == ID_HX8357D)) {
+  } else if ((driver == ID_9341) || (driver == ID_7575) || (driver == ID_HX8357D) || (driver == ID_HX8347A)) {
     // For these, there is no settable address pointer, instead the
     // address window must be set for each drawing operation.  However,
     // this display takes rotation into account for the parameters, no
@@ -660,7 +847,7 @@ void Adafruit_TFTLCD::drawPixel(int16_t x, int16_t y, uint16_t color) {
     writeRegister16(0x0021, y);
     writeRegister16(0x0022, color);
 
-  } else if(driver == ID_7575) {
+  } else if((driver == ID_7575) || (driver == ID_HX8347A)) {
 
     uint8_t hi, lo;
     switch(rotation) {
@@ -737,7 +924,7 @@ void Adafruit_TFTLCD::setRotation(uint8_t x) {
     setAddrWindow(0, 0, _width - 1, _height - 1); // CS_IDLE happens here
 
   }
- if(driver == ID_7575) {
+ if((driver == ID_7575) || (driver == ID_HX8347A)) {
 
     uint8_t t;
     switch(rotation) {
@@ -850,7 +1037,7 @@ uint16_t Adafruit_TFTLCD::readPixel(int16_t x, int16_t y) {
     CS_IDLE;
     return ((uint16_t)hi << 8) | lo;
 
-  } else if(driver == ID_7575) {
+  } else if((driver == ID_7575) || (driver == ID_HX8347A)) {
 
     uint8_t r, g, b;
     writeRegisterPair(HX8347G_COLADDRSTART_HI, HX8347G_COLADDRSTART_LO, x);
@@ -901,6 +1088,11 @@ uint16_t Adafruit_TFTLCD::readID(void) {
 
   uint16_t id = readReg(0xD3);
   if (id == 0x9341) {
+    return id;
+  }
+
+  id = readReg(0x67);
+  if (id == 0x4747) {
     return id;
   }
 
